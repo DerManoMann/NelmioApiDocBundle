@@ -16,8 +16,10 @@ use Nelmio\ApiDocBundle\Annotation\Operation;
 use Nelmio\ApiDocBundle\Annotation\Security;
 use Nelmio\ApiDocBundle\OpenApiPhp\Util;
 use Nelmio\ApiDocBundle\Util\ControllerReflector;
-use OpenApi\Analyser;
+use OpenApi\Analysis;
 use OpenApi\Annotations as OA;
+use OpenApi\Context;
+use OpenApi\Generator;
 use Psr\Log\LoggerInterface;
 use Symfony\Component\Routing\Route;
 use Symfony\Component\Routing\RouteCollection;
@@ -52,22 +54,30 @@ final class OpenApiPhpDescriber
 
             $path = Util::getPath($api, $path);
 
-            Analyser::$context = Util::createContext(['nested' => $path], $path->_context);
-            Analyser::$context->namespace = $method->getNamespaceName();
-            Analyser::$context->class = $declaringClass->getShortName();
-            Analyser::$context->method = $method->name;
-            Analyser::$context->filename = $method->getFileName();
+            Generator::$context = Util::createContext(['nested' => $path], $path->_context);
+            $annotations = (new Generator())
+                ->withContext(function (Generator $generator, Analysis $analysis, Context $context) use ($path, $method, &$classAnnotations) {
+                    $declaringClass = $method->getDeclaringClass();
+                    Generator::$context = Util::createContext(['nested' => $path], $path->_context);
+                    Generator::$context->namespace = $method->getNamespaceName();
+                    Generator::$context->class = $declaringClass->getShortName();
+                    Generator::$context->method = $method->name;
+                    Generator::$context->filename = $method->getFileName();
 
-            if (!array_key_exists($declaringClass->getName(), $classAnnotations)) {
-                $classAnnotations = array_filter($this->annotationReader->getClassAnnotations($declaringClass), function ($v) {
-                    return $v instanceof OA\AbstractAnnotation;
+                    if (!array_key_exists($declaringClass->getName(), $classAnnotations)) {
+                        $classAnnotations = array_filter($this->annotationReader->getClassAnnotations($declaringClass), function ($v) {
+                            return $v instanceof OA\AbstractAnnotation;
+                        });
+                        $classAnnotations[$declaringClass->getName()] = $classAnnotations;
+                    }
+
+                    $annotations = array_filter($this->annotationReader->getMethodAnnotations($method), function ($v) {
+                        return $v instanceof OA\AbstractAnnotation;
+                    });
+
+                    return $annotations;
                 });
-                $classAnnotations[$declaringClass->getName()] = $classAnnotations;
-            }
 
-            $annotations = array_filter($this->annotationReader->getMethodAnnotations($method), function ($v) {
-                return $v instanceof OA\AbstractAnnotation;
-            });
 
             if (0 === count($annotations) && 0 === count($classAnnotations[$declaringClass->getName()])) {
                 continue;
@@ -90,7 +100,7 @@ final class OpenApiPhpDescriber
                     if (!in_array($annotation->method, $httpMethods, true)) {
                         continue;
                     }
-                    if (OA\UNDEFINED !== $annotation->path && $path->path !== $annotation->path) {
+                    if (Generator::UNDEFINED !== $annotation->path && $path->path !== $annotation->path) {
                         continue;
                     }
 
@@ -138,7 +148,7 @@ final class OpenApiPhpDescriber
         }
 
         // Reset the Analyser after the parsing
-        Analyser::$context = null;
+        Generator::$context = null;
     }
 
     private function getMethodsToParse(): \Generator

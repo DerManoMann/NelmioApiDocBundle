@@ -15,10 +15,10 @@ use Doctrine\Common\Annotations\Reader;
 use Nelmio\ApiDocBundle\Model\ModelRegistry;
 use Nelmio\ApiDocBundle\OpenApiPhp\ModelRegister;
 use Nelmio\ApiDocBundle\OpenApiPhp\Util;
-use OpenApi\Analyser;
 use OpenApi\Analysis;
 use OpenApi\Annotations as OA;
 use OpenApi\Context;
+use OpenApi\Generator;
 
 /**
  * @internal
@@ -60,35 +60,41 @@ class OpenApiAnnotationsReader
             return $default;
         }
 
-        return OA\UNDEFINED !== $oaProperty->property ? $oaProperty->property : $default;
+        return Generator::UNDEFINED !== $oaProperty->property ? $oaProperty->property : $default;
     }
 
     public function updateProperty($reflection, OA\Property $property, array $serializationGroups = null): void
     {
-        // In order to have nicer errors
-        $declaringClass = $reflection->getDeclaringClass();
-        Analyser::$context = new Context([
-            'namespace' => $declaringClass->getNamespaceName(),
-            'class' => $declaringClass->getShortName(),
-            'property' => $reflection->name,
-            'filename' => $declaringClass->getFileName(),
-        ]);
+        $oaProperty = (new Generator())
+            ->withContext(function (Generator $generator, Analysis $analysis, Context $context) use ($reflection) {
+                // In order to have nicer errors
+                $declaringClass = $reflection->getDeclaringClass();
+                $context->namespace = $declaringClass->getNamespaceName();
+                $context->class = $declaringClass->getShortName();
+                $context->property = $reflection->name;
+                $context->filename = $declaringClass->getFileName();
 
-        /** @var OA\Property $oaProperty */
-        if ($reflection instanceof \ReflectionProperty && !$oaProperty = $this->annotationsReader->getPropertyAnnotation($reflection, OA\Property::class)) {
-            return;
-        } elseif ($reflection instanceof \ReflectionMethod && !$oaProperty = $this->annotationsReader->getMethodAnnotation($reflection, OA\Property::class)) {
-            return;
+                Generator::$context = $context;
+                /** @var OA\Property $oaProperty */
+                if ($reflection instanceof \ReflectionProperty && !$oaProperty = $this->annotationsReader->getPropertyAnnotation($reflection, OA\Property::class)) {
+                    return null;
+                } elseif ($reflection instanceof \ReflectionMethod && !$oaProperty = $this->annotationsReader->getMethodAnnotation($reflection, OA\Property::class)) {
+                    return null;
+                }
+
+                return $oaProperty;
+            });
+        Generator::$context = null;
+
+        if ($oaProperty) {
+            // Read @Model annotations
+            $this->modelRegister->__invoke(new Analysis([$oaProperty], Util::createContext()), $serializationGroups);
+
+            if (!$oaProperty->validate()) {
+                return;
+            }
+
+            $property->mergeProperties($oaProperty);
         }
-        Analyser::$context = null;
-
-        // Read @Model annotations
-        $this->modelRegister->__invoke(new Analysis([$oaProperty], Util::createContext()), $serializationGroups);
-
-        if (!$oaProperty->validate()) {
-            return;
-        }
-
-        $property->mergeProperties($oaProperty);
     }
 }
