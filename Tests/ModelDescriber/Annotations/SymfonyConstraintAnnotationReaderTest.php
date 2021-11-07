@@ -251,7 +251,7 @@ class SymfonyConstraintAnnotationReaderTest extends TestCase
     {
         $entity = new class() {
             /**
-             * @CustomAssert\CompoundValidationRule()
+             * @Nelmio\ApiDocBundle\Tests\ModelDescriber\Annotations\Fixture\CompoundValidationRule()
              */
             private $property1;
         };
