@@ -1,3 +1,17 @@
+# Changelog
+
+## [4.5.0](https://github.com/DerManoMann/NelmioApiDocBundle/compare/v4.4.0...v4.5.0) (2026-08-18)
+
+
+### Features
+
+* **dependencies:** [#1913](https://github.com/DerManoMann/NelmioApiDocBundle/issues/1913) - upgrade symfony 60 dependencies ([2ade72d](https://github.com/DerManoMann/NelmioApiDocBundle/commit/2ade72d0aae64d94024745802a9fb85cf498d6c8))
+
+
+### Bug Fixes
+
+* 1885 update psr/log and psr/container ([#1892](https://github.com/DerManoMann/NelmioApiDocBundle/issues/1892)) ([35cf37e](https://github.com/DerManoMann/NelmioApiDocBundle/commit/35cf37e338ae0bc5797f186b7c41efda32ed5806))
+
 CHANGELOG
 =========
 
