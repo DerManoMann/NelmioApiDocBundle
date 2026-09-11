@@ -11,7 +11,7 @@
 
 namespace Nelmio\ApiDocBundle\Tests\Functional\Controller;
 
-use OpenApi\Attributes as OA;
+use OpenApi\Spec as OA;
 use Symfony\Component\HttpKernel\Attribute\MapQueryParameter;
 use Symfony\Component\Routing\Attribute\Route;
 
@@ -124,19 +124,19 @@ class MapQueryParameterController
     #[OA\Response(response: '200', description: '')]
     public function fetchArticleWithParameterNamesFromContext(
         #[MapQueryParameter]
-        #[OA\QueryParameter(
+        #[OA\Parameter\Query(
             description: 'User ID from parameter context',
             schema: new OA\Schema(type: 'integer', minimum: 1)
         )]
         int $userId,
         #[MapQueryParameter]
-        #[OA\QueryParameter(
+        #[OA\Parameter\Query(
             description: 'Search query from parameter context',
             schema: new OA\Schema(type: 'string', minLength: 3)
         )]
         string $searchQuery,
         #[MapQueryParameter]
-        #[OA\QueryParameter(
+        #[OA\Parameter\Query(
             description: 'Page number from parameter context',
             schema: new OA\Schema(type: 'integer', minimum: 1, maximum: 100)
         )]

@@ -11,11 +11,12 @@
 
 namespace Nelmio\ApiDocBundle\Tests\Functional\Controller;
 
-use Nelmio\ApiDocBundle\Attribute\Model;
+use Nelmio\ApiDocBundle\SpecPoC\Attributes\ContentModel;
+use Nelmio\ApiDocBundle\SpecPoC\Attributes\RefModel;
 use Nelmio\ApiDocBundle\Tests\Functional\Entity\Article81;
 use Nelmio\ApiDocBundle\Tests\Functional\Entity\EntityWithNullableSchemaSet;
 use Nelmio\ApiDocBundle\Tests\Functional\Entity\SymfonyConstraintsWithValidationGroups;
-use OpenApi\Attributes as OA;
+use OpenApi\Spec as OA;
 use Symfony\Component\HttpKernel\Attribute\MapRequestPayload;
 use Symfony\Component\Routing\Attribute\Route;
 
@@ -40,7 +41,7 @@ class MapRequestPayloadController
     #[Route('/article_map_request_payload_overwrite', methods: ['POST'])]
     #[OA\RequestBody(
         description: 'Request body description',
-        content: new Model(type: EntityWithNullableSchemaSet::class),
+        content: new ContentModel(EntityWithNullableSchemaSet::class),
     )]
     #[OA\Response(response: '200', description: '')]
     public function createArticleFromMapRequestPayloadOverwrite(
@@ -52,8 +53,8 @@ class MapRequestPayloadController
     #[Route('/article_map_request_payload_handles_already_set_content', methods: ['POST'])]
     #[OA\RequestBody(
         description: 'Request body description',
-        content: new OA\JsonContent(
-            ref: new Model(type: Article81::class)
+        content: new OA\MediaType\Json(
+            ref: new RefModel(Article81::class)
         ),
     )]
     #[OA\Response(response: '200', description: '')]

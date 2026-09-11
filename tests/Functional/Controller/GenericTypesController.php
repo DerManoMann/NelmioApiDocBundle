@@ -11,9 +11,9 @@
 
 namespace Nelmio\ApiDocBundle\Tests\Functional\Controller;
 
-use Nelmio\ApiDocBundle\Attribute\Model;
+use Nelmio\ApiDocBundle\SpecPoC\Attributes\ContentModel;
 use Nelmio\ApiDocBundle\Tests\Functional\Entity\GenericTypes;
-use OpenApi\Attributes as OA;
+use OpenApi\Spec as OA;
 use Symfony\Component\Routing\Attribute\Route;
 
 class GenericTypesController
@@ -21,7 +21,7 @@ class GenericTypesController
     #[OA\Response(
         response: '200',
         description: 'Success',
-        content: new Model(type: GenericTypes::class),
+        content: new ContentModel(GenericTypes::class),
     )]
     #[Route('/generic-types', methods: ['GET'])]
     public function genericTypesAction(): void
