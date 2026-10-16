@@ -11,20 +11,21 @@
 
 namespace Nelmio\ApiDocBundle\Tests\Functional\Controller;
 
-use OpenApi\Attributes as OA;
 use Symfony\Component\Routing\Attribute\Route;
+use OpenApi\Spec as OAS;
 
-#[OA\Tag(name: 'My tag name', description: 'My description of the tag', externalDocs: new OA\ExternalDocumentation(url: 'https://example.com'))]
+#[OAS\Tag(name: 'My tag name', description: 'My description of the tag', externalDocs: new OAS\ExternalDocumentation(url: 'https://example.com'))]
+#[OAS\Components]
 class OpenApiTagController
 {
     #[Route('/some_post', methods: ['POST'])]
-    #[OA\Response(response: '200', description: '')]
+    #[OAS\Response(response: '200', description: '')]
     public function somePost(): void
     {
     }
 
     #[Route('/some_get', methods: ['GET'])]
-    #[OA\Response(response: '200', description: '')]
+    #[OAS\Response(response: '200', description: '')]
     public function someGet(): void
     {
     }

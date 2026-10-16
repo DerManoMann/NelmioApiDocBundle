@@ -11,14 +11,15 @@
 
 namespace Nelmio\ApiDocBundle\Tests\Functional\Controller;
 
-use OpenApi\Attributes as OA;
 use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\Routing\Attribute\Route;
+use OpenApi\Spec as OAS;
 
+#[OAS\Components]
 abstract class AbstractDocumentController
 {
     #[Route('', methods: ['GET'])]
-    #[OA\Response(response: 200, description: 'List documents')]
+    #[OAS\Response(response: 200, description: 'List documents')]
     public function getDocuments(): JsonResponse
     {
     }

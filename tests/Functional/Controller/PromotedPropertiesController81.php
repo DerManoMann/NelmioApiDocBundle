@@ -11,23 +11,23 @@
 
 namespace Nelmio\ApiDocBundle\Tests\Functional\Controller;
 
-use Nelmio\ApiDocBundle\Attribute\Model;
+use Nelmio\ApiDocBundle\SpecDescribers\Model;
 use Nelmio\ApiDocBundle\Tests\Functional\Entity\EntityWithPromotedPropertiesWithDefaults;
-use OpenApi\Attributes as OA;
 use Symfony\Component\Routing\Attribute\Route;
+use OpenApi\Spec as OAS;
 
 class PromotedPropertiesController81
 {
     #[Route('/entity-with-promoted-properties-with-defaults', methods: ['GET'])]
-    #[OA\Get(
+    #[OAS\Operation\Get(
         operationId: 'getEntityWithPromotedPropertiesWithDefaults',
     )]
-    #[OA\Response(
+    #[OAS\Response(
         response: 204,
         description: 'Operation automatically detected',
     )]
-    #[OA\RequestBody(
-        content: new Model(type: EntityWithPromotedPropertiesWithDefaults::class),
+    #[OAS\RequestBody(
+        content: new OAS\MediaType\Json(ref: new Model(type: EntityWithPromotedPropertiesWithDefaults::class)),
     )]
     public function entityWithPromotedPropertiesWithDefaults(): void
     {

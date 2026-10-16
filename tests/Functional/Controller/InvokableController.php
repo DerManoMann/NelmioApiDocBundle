@@ -11,13 +11,13 @@
 
 namespace Nelmio\ApiDocBundle\Tests\Functional\Controller;
 
-use OpenApi\Attributes as OA;
 use Symfony\Component\Routing\Attribute\Route;
+use OpenApi\Spec as OAS;
 
 /**
  * Prevents a regression (see https://github.com/nelmio/NelmioApiDocBundle/issues/1559).
  */
-#[OA\Response(response: 200, description: 'Invokable!')]
+#[OAS\Response(response: 200, description: 'Invokable!')]
 #[Route('/api/invoke', host: 'api.example.com', name: 'invokable', methods: ['GET'])]
 class InvokableController
 {

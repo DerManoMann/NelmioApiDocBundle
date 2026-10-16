@@ -12,7 +12,7 @@
 namespace Nelmio\ApiDocBundle\Tests\Functional\Controller;
 
 use Nelmio\ApiDocBundle\Attribute\Areas;
-use Nelmio\ApiDocBundle\Attribute\Model;
+use Nelmio\ApiDocBundle\SpecDescribers\Model;
 use Nelmio\ApiDocBundle\Attribute\Operation;
 use Nelmio\ApiDocBundle\Attribute\Security;
 use Nelmio\ApiDocBundle\Tests\Functional\Entity\ArrayItems\Dictionary;
@@ -45,30 +45,31 @@ use Nelmio\ApiDocBundle\Tests\Functional\Form\FormWithCsrfProtectionEnabledType;
 use Nelmio\ApiDocBundle\Tests\Functional\Form\FormWithModel;
 use Nelmio\ApiDocBundle\Tests\Functional\Form\FormWithRefType;
 use Nelmio\ApiDocBundle\Tests\Functional\Form\UserType;
-use OpenApi\Attributes as OA;
 use Symfony\Component\Routing\Attribute\Route;
+use OpenApi\Spec as OAS;
 
 #[Route('/api', name: 'api_', host: 'api.example.com')]
+#[OAS\Components]
 class ApiController
 {
-    #[OA\Response(
+    #[OAS\Response(
         response: '200',
         description: 'Success',
         attachables: [
             new Model(type: Article::class, groups: ['light']),
         ],
     )]
-    #[OA\Parameter(ref: '#/components/parameters/test')]
+    #[OAS\Parameter(ref: '#/components/parameters/test')]
     #[Route('/article/{id}', methods: ['GET'])]
-    #[OA\Parameter(name: 'Accept-Version', in: 'header', schema: new OA\Schema(type: 'string'))]
-    #[OA\Parameter(name: 'Application-Name', in: 'header', schema: new OA\Schema(type: 'string'))]
+    #[OAS\Parameter(name: 'Accept-Version', in: 'header', schema: new OAS\Schema(type: 'string'))]
+    #[OAS\Parameter(name: 'Application-Name', in: 'header', schema: new OAS\Schema(type: 'string'))]
     public function fetchArticleAction(): void
     {
     }
 
-    #[OA\Get(
+    #[OAS\Operation\Get(
         responses: [
-            new OA\Response(
+            new OAS\Response(
                 response: '200',
                 description: 'Success',
                 attachables: [
@@ -77,10 +78,10 @@ class ApiController
             ),
         ],
     )]
-    #[OA\Parameter(ref: '#/components/parameters/test')]
+    #[OAS\Parameter(ref: '#/components/parameters/test')]
     #[Route('/article-interface/{id}', methods: ['GET'])]
-    #[OA\Parameter(name: 'Accept-Version', in: 'header', schema: new OA\Schema(type: 'string'))]
-    #[OA\Parameter(name: 'Application-Name', in: 'header', schema: new OA\Schema(type: 'string'))]
+    #[OAS\Parameter(name: 'Accept-Version', in: 'header', schema: new OAS\Schema(type: 'string'))]
+    #[OAS\Parameter(name: 'Application-Name', in: 'header', schema: new OAS\Schema(type: 'string'))]
     public function fetchArticleInterfaceAction(): void
     {
     }
@@ -89,22 +90,22 @@ class ApiController
     #[Route('/swagger2', methods: ['GET'])]
     #[Operation([
         'responses' => [
-            new OA\Response(
+            new OAS\Response(
                 response: '201',
                 description: 'An example resource',
             ),
         ],
     ])]
-    #[OA\Get(
+    #[OAS\Operation\Get(
         path: '/api/swagger2',
         parameters: [
-            new OA\Parameter(name: 'Accept-Version', in: 'header', schema: new OA\Schema(type: 'string')),
+            new OAS\Parameter(name: 'Accept-Version', in: 'header', schema: new OAS\Schema(type: 'string')),
         ],
     )]
-    #[OA\Post(
+    #[OAS\Operation\Post(
         path: '/api/swagger2',
         responses: [
-            new OA\Response(
+            new OAS\Response(
                 response: '203',
                 description: 'but 203 is not actually allowed (wrong method)',
             ),
@@ -115,43 +116,43 @@ class ApiController
     }
 
     #[Route('/swagger/implicit', methods: ['GET', 'POST'])]
-    #[OA\Response(
+    #[OAS\Response(
         response: '201',
         description: 'Operation automatically detected',
         attachables: [
             new Model(type: User::class),
         ],
     )]
-    #[OA\RequestBody(
+    #[OAS\RequestBody(
         description: 'This is a request body',
-        content: new OA\JsonContent(
+        content: new OAS\MediaType\Json(
             type: 'array',
-            items: new OA\Items(ref: '#/components/schemas/User'),
+            items: new OAS\Schema\Items(ref: '#/components/schemas/User'),
         ),
     )]
-    #[OA\Tag(name: 'implicit')]
+    #[OAS\Operation\Get(tags: ['implicit'])] // was a method-level classic Tag, which spec does not allow (finding 16); Operation without a method throws (17)
     public function implicitSwaggerAction(): void
     {
     }
 
     #[Route('/test/users/{user}', methods: ['POST'], schemes: ['https'], requirements: ['user' => '/foo/'])]
-    #[OA\Response(
+    #[OAS\Response(
         response: '201',
         description: 'Operation automatically detected',
         attachables: [
             new Model(type: User::class),
         ],
     )]
-    #[OA\RequestBody(
+    #[OAS\RequestBody(
         description: 'This is a request body',
-        content: new Model(type: UserType::class, options: ['bar' => 'baz']),
+        content: new OAS\MediaType\Json(ref: new Model(type: UserType::class, options: ['bar' => 'baz'])),
     )]
     public function submitUserTypeAction(): void
     {
     }
 
     #[Route('/test/{user}', methods: ['GET'], schemes: ['https'], requirements: ['user' => '/foo/'])]
-    #[OA\Response(response: 200, description: 'sucessful')]
+    #[OAS\Response(response: 200, description: 'sucessful')]
     public function userAction(): void
     {
     }
@@ -176,10 +177,10 @@ class ApiController
     {
     }
 
-    #[OA\Get(
+    #[OAS\Operation\Get(
         path: '/filtered',
         responses: [
-            new OA\Response(response: '201', description: ''),
+            new OAS\Response(response: '201', description: ''),
         ],
     )]
     public function filteredAction(): void
@@ -187,37 +188,37 @@ class ApiController
     }
 
     #[Route('/form', methods: ['POST'])]
-    #[OA\RequestBody(
+    #[OAS\RequestBody(
         description: 'Request content',
-        content: new Model(type: DummyType::class),
+        content: new OAS\MediaType\Json(ref: new Model(type: DummyType::class)),
     )]
-    #[OA\Response(response: 201, description: '')]
+    #[OAS\Response(response: 201, description: '')]
     public function formAction(): void
     {
     }
 
     #[Route('/form-model', methods: ['POST'])]
-    #[OA\RequestBody(
+    #[OAS\RequestBody(
         description: 'Request content',
-        content: new Model(type: FormWithModel::class),
+        content: new OAS\MediaType\Json(ref: new Model(type: FormWithModel::class)),
     )]
-    #[OA\Response(response: 201, description: '')]
+    #[OAS\Response(response: 201, description: '')]
     public function formWithModelAction(): void
     {
     }
 
     #[Route('/form-model-renamed', methods: ['POST'])]
-    #[OA\RequestBody(
+    #[OAS\RequestBody(
         description: 'Request content',
-        content: new Model(type: FormWithModel::class, name: 'RenamedFormWithModel'),
+        content: new OAS\MediaType\Json(ref: new Model(type: FormWithModel::class, name: 'RenamedFormWithModel')),
     )]
-    #[OA\Response(response: 201, description: '')]
+    #[OAS\Response(response: 201, description: '')]
     public function formWithModelRenamed(): void
     {
     }
 
     #[Route('/security', methods: ['GET'])]
-    #[OA\Response(response: 201, description: '')]
+    #[OAS\Response(response: 201, description: '')]
     #[Security(name: 'api_key')]
     #[Security(name: 'basic')]
     #[Security(name: 'oauth2', scopes: ['scope_1'])]
@@ -226,7 +227,7 @@ class ApiController
     }
 
     #[Route('/securityOverride')]
-    #[OA\Response(response: 201, description: '')]
+    #[OAS\Response(response: 201, description: '')]
     #[Security(name: 'api_key')]
     #[Security(name: null)]
     public function securityActionOverride(): void
@@ -234,21 +235,21 @@ class ApiController
     }
 
     #[Route('/swagger/symfonyConstraints', methods: ['GET'])]
-    #[OA\Response(
+    #[OAS\Response(
         response: '201',
         description: 'Used for symfony constraints test',
-        content: new Model(type: SymfonyConstraints::class),
+        content: new OAS\MediaType\Json(ref: new Model(type: SymfonyConstraints::class)),
     )]
     public function symfonyConstraintsAction(): void
     {
     }
 
-    #[OA\Response(
+    #[OAS\Response(
         response: '200',
         description: 'Success',
         ref: '#/components/schemas/Test',
     )]
-    #[OA\Response(
+    #[OAS\Response(
         response: '201',
         ref: '#/components/responses/201',
     )]
@@ -258,9 +259,9 @@ class ApiController
     }
 
     #[Route('/multi-annotations', methods: ['GET', 'POST'])]
-    #[OA\Get(description: 'This is the get operation')]
-    #[OA\Post(description: 'This is post')]
-    #[OA\Response(response: 200, description: 'Worked well!', attachables: [new Model(type: DummyType::class)])]
+    #[OAS\Operation\Get(description: 'This is the get operation')]
+    #[OAS\Operation\Post(description: 'This is post')]
+    #[OAS\Response(response: 200, description: 'Worked well!', attachables: [new Model(type: DummyType::class)])]
     public function operationsWithOtherAnnotations(): void
     {
     }
@@ -272,53 +273,53 @@ class ApiController
     }
 
     #[Route('/compound', methods: ['GET', 'POST'])]
-    #[OA\Response(response: 200, description: 'Worked well!', attachables: [new Model(type: CompoundEntity::class)])]
+    #[OAS\Response(response: 200, description: 'Worked well!', attachables: [new Model(type: CompoundEntity::class)])]
     public function compoundEntityAction(): void
     {
     }
 
     #[Route('/discriminator-mapping', methods: ['GET', 'POST'])]
-    #[OA\Response(response: 200, description: 'Worked well!', attachables: [new Model(type: SymfonyDiscriminator::class)])]
+    #[OAS\Response(response: 200, description: 'Worked well!', attachables: [new Model(type: SymfonyDiscriminator::class)])]
     public function discriminatorMappingAction(): void
     {
     }
 
     #[Route('/discriminator-mapping-configured-with-file', methods: ['GET', 'POST'])]
-    #[OA\Response(response: 200, description: 'Worked well!', attachables: [new Model(type: SymfonyDiscriminatorFileMapping::class)])]
+    #[OAS\Response(response: 200, description: 'Worked well!', attachables: [new Model(type: SymfonyDiscriminatorFileMapping::class)])]
     public function discriminatorMappingConfiguredWithFileAction(): void
     {
     }
 
     #[Route('/named_route-operation-id', name: 'named_route_operation_id', methods: ['GET', 'POST'])]
-    #[OA\Response(response: 200, description: 'success')]
+    #[OAS\Response(response: 200, description: 'success')]
     public function namedRouteOperationIdAction(): void
     {
     }
 
     #[Route('/custom-operation-id', methods: ['GET', 'POST'])]
-    #[OA\Get(operationId: 'get-custom-operation-id')]
-    #[OA\Post(operationId: 'post-custom-operation-id')]
-    #[OA\Response(response: 200, description: 'success')]
+    #[OAS\Operation\Get(operationId: 'get-custom-operation-id')]
+    #[OAS\Operation\Post(operationId: 'post-custom-operation-id')]
+    #[OAS\Response(response: 200, description: 'success')]
     public function customOperationIdAction(): void
     {
     }
 
     #[Route('/swagger/symfonyConstraintsWithValidationGroups', methods: ['GET'])]
-    #[OA\Response(
+    #[OAS\Response(
         response: '201',
         description: 'Used for symfony constraints with validation groups test',
-        content: new Model(type: SymfonyConstraintsWithValidationGroups::class, groups: ['test']),
+        content: new OAS\MediaType\Json(ref: new Model(type: SymfonyConstraintsWithValidationGroups::class, groups: ['test'])),
     )]
     public function symfonyConstraintsWithGroupsAction(): void
     {
     }
 
     #[Route('/alternate-entity-type', methods: ['GET', 'POST'])]
-    #[OA\Get(operationId: 'alternate-entity-type')]
-    #[OA\Response(
+    #[OAS\Operation\Get(operationId: 'alternate-entity-type')]
+    #[OAS\Response(
         response: 200,
         description: 'success',
-        content: new OA\JsonContent(
+        content: new OAS\MediaType\Json(
             ref: new Model(type: EntityWithAlternateType::class),
         ),
     )]
@@ -327,11 +328,11 @@ class ApiController
     }
 
     #[Route('/entity-with-ref', methods: ['GET', 'POST'])]
-    #[OA\Get(operationId: 'entity-with-ref')]
-    #[OA\Response(
+    #[OAS\Operation\Get(operationId: 'entity-with-ref')]
+    #[OAS\Response(
         response: 200,
         description: 'success',
-        content: new OA\JsonContent(
+        content: new OAS\MediaType\Json(
             ref: new Model(type: EntityWithRef::class),
         ),
     )]
@@ -340,11 +341,11 @@ class ApiController
     }
 
     #[Route('/entity-with-object-type', methods: ['GET', 'POST'])]
-    #[OA\Get(operationId: 'entity-with-object-type')]
-    #[OA\Response(
+    #[OAS\Operation\Get(operationId: 'entity-with-object-type')]
+    #[OAS\Response(
         response: 200,
         description: 'success',
-        content: new OA\JsonContent(
+        content: new OAS\MediaType\Json(
             ref: new Model(type: EntityWithObjectType::class),
         ),
     )]
@@ -353,10 +354,10 @@ class ApiController
     }
 
     #[Route('/entity-with-uuid', methods: ['GET', 'POST'])]
-    #[OA\Response(
+    #[OAS\Response(
         response: 200,
         description: 'success',
-        content: new OA\JsonContent(
+        content: new OAS\MediaType\Json(
             ref: new Model(type: EntityWithUuid::class),
         ),
     )]
@@ -365,10 +366,10 @@ class ApiController
     }
 
     #[Route('/entity-with-ulid', methods: ['GET', 'POST'])]
-    #[OA\Response(
+    #[OAS\Response(
         response: 200,
         description: 'success',
-        content: new OA\JsonContent(
+        content: new OAS\MediaType\Json(
             ref: new Model(type: EntityWithUlid::class),
         ),
     )]
@@ -377,10 +378,10 @@ class ApiController
     }
 
     #[Route('/entity-with-translatable', methods: ['GET', 'POST'])]
-    #[OA\Response(
+    #[OAS\Response(
         response: 200,
         description: 'success',
-        content: new OA\JsonContent(
+        content: new OAS\MediaType\Json(
             ref: new Model(type: EntityWithTranslatable::class),
         ),
     )]
@@ -389,55 +390,55 @@ class ApiController
     }
 
     #[Route('/form-with-alternate-type', methods: ['POST'])]
-    #[OA\Response(
+    #[OAS\Response(
         response: 204,
         description: 'Operation automatically detected',
     )]
-    #[OA\RequestBody(
-        content: new Model(type: FormWithAlternateSchemaType::class),
+    #[OAS\RequestBody(
+        content: new OAS\MediaType\Json(ref: new Model(type: FormWithAlternateSchemaType::class)),
     )]
     public function formWithAlternateSchemaType(): void
     {
     }
 
     #[Route('/form-with-ref-type', methods: ['POST'])]
-    #[OA\Response(
+    #[OAS\Response(
         response: 204,
         description: 'Operation automatically detected',
     )]
-    #[OA\RequestBody(
-        content: new Model(type: FormWithRefType::class),
+    #[OAS\RequestBody(
+        content: new OAS\MediaType\Json(ref: new Model(type: FormWithRefType::class)),
     )]
     public function formWithRefSchemaType(): void
     {
     }
 
     #[Route('/form-with-csrf-protection-enabled-type', methods: ['POST'])]
-    #[OA\Response(
+    #[OAS\Response(
         response: 204,
         description: 'Operation automatically detected',
     )]
-    #[OA\RequestBody(
-        content: new Model(type: FormWithCsrfProtectionEnabledType::class),
+    #[OAS\RequestBody(
+        content: new OAS\MediaType\Json(ref: new Model(type: FormWithCsrfProtectionEnabledType::class)),
     )]
     public function formWithCsrfProtectionEnabledType(): void
     {
     }
 
     #[Route('/form-with-csrf-protection-disabled-type', methods: ['POST'])]
-    #[OA\Response(
+    #[OAS\Response(
         response: 204,
         description: 'Operation automatically detected',
     )]
-    #[OA\RequestBody(
-        content: new Model(type: FormWithCsrfProtectionDisabledType::class),
+    #[OAS\RequestBody(
+        content: new OAS\MediaType\Json(ref: new Model(type: FormWithCsrfProtectionDisabledType::class)),
     )]
     public function formWithCsrfProtectionDisabledType(): void
     {
     }
 
     #[Route('/entity-with-nullable-property-set', methods: ['GET'])]
-    #[OA\Response(
+    #[OAS\Response(
         response: 201,
         description: 'Operation automatically detected',
         attachables: [
@@ -449,19 +450,19 @@ class ApiController
     }
 
     #[Route('/entity-with-falsy-defaults', methods: ['GET'])]
-    #[OA\Response(
+    #[OAS\Response(
         response: 204,
         description: 'Operation automatically detected',
     )]
-    #[OA\RequestBody(
-        content: new Model(type: EntityWithFalsyDefaults::class),
+    #[OAS\RequestBody(
+        content: new OAS\MediaType\Json(ref: new Model(type: EntityWithFalsyDefaults::class)),
     )]
     public function entityWithFalsyDefaults(): void
     {
     }
 
-    #[OA\Get(responses: [
-        new OA\Response(
+    #[OAS\Operation\Get(responses: [
+        new OAS\Response(
             response: '200',
             description: 'Success',
             attachables: [
@@ -469,9 +470,9 @@ class ApiController
             ],
         ),
     ])]
-    #[OA\Parameter(ref: '#/components/parameters/test')]
+    #[OAS\Parameter(ref: '#/components/parameters/test')]
     #[Route('/article_attributes/{id}', methods: ['GET'])]
-    #[OA\Parameter(name: 'Accept-Version', in: 'header', schema: new OA\Schema(type: 'string'))]
+    #[OAS\Parameter(name: 'Accept-Version', in: 'header', schema: new OAS\Schema(type: 'string'))]
     public function fetchArticleActionWithAttributes(): void
     {
     }
@@ -483,7 +484,7 @@ class ApiController
     }
 
     #[Route('/security_attributes')]
-    #[OA\Response(response: '201', description: '')]
+    #[OAS\Response(response: '201', description: '')]
     #[Security(name: 'api_key')]
     #[Security(name: 'basic')]
     #[Security(name: 'oauth2', scopes: ['scope_1'])]
@@ -492,7 +493,7 @@ class ApiController
     }
 
     #[Route('/security_override_attributes')]
-    #[OA\Response(response: '201', description: '')]
+    #[OAS\Response(response: '201', description: '')]
     #[Security(name: 'api_key')]
     #[Security(name: null)]
     public function securityOverrideActionAttributes(): void
@@ -500,63 +501,63 @@ class ApiController
     }
 
     #[Route('/inline_path_parameters')]
-    #[OA\Response(response: '200', description: '')]
+    #[OAS\Response(response: '200', description: '')]
     public function inlinePathParameters(
-        #[OA\PathParameter]
+        #[OAS\Parameter\Path]
         string $product_id,
     ): void {
     }
 
     #[Route('/enum')]
-    #[OA\Response(response: '201', description: '', attachables: [new Model(type: Article81::class)])]
+    #[OAS\Response(response: '201', description: '', attachables: [new Model(type: Article81::class)])]
     public function enum(): void
     {
     }
 
     #[Route('/range_integer', methods: ['GET'])]
-    #[OA\Response(response: '200', description: '', attachables: [new Model(type: RangeInteger::class)])]
+    #[OAS\Response(response: '200', description: '', attachables: [new Model(type: RangeInteger::class)])]
     public function rangeInteger(): void
     {
     }
 
     #[Route('/serializename', methods: ['GET'])]
-    #[OA\Response(response: 200, description: 'success', content: new Model(type: SerializedNameEntity::class))]
+    #[OAS\Response(response: 200, description: 'success', content: new OAS\MediaType\Json(ref: new Model(type: SerializedNameEntity::class)))]
     public function serializedNameAction(): void
     {
     }
 
     #[Route('/name_converter_context', methods: ['GET'])]
-    #[OA\Response(
+    #[OAS\Response(
         response: '200',
         description: '',
-        content: new Model(type: EntityThroughNameConverter::class, serializationContext: ['secret_name_converter_value' => true])
+        content: new OAS\MediaType\Json(ref: new Model(type: EntityThroughNameConverter::class, serializationContext: ['secret_name_converter_value' => true]))
     )]
-    #[OA\Response(
+    #[OAS\Response(
         response: '201',
         description: 'Same class without context',
-        content: new Model(type: EntityThroughNameConverter::class)
+        content: new OAS\MediaType\Json(ref: new Model(type: EntityThroughNameConverter::class))
     )]
     public function nameConverterContext(): void
     {
     }
 
     #[Route('/arbitrary_array', methods: ['GET'])]
-    #[OA\Response(response: 200, description: 'Success', content: new Model(type: Foo::class))]
+    #[OAS\Response(response: 200, description: 'Success', content: new OAS\MediaType\Json(ref: new Model(type: Foo::class)))]
     public function arbitraryArray(): void
     {
     }
 
     #[Route('/dictionary', methods: ['GET'])]
-    #[OA\Response(response: 200, description: 'Success', content: new Model(type: Dictionary::class))]
+    #[OAS\Response(response: 200, description: 'Success', content: new OAS\MediaType\Json(ref: new Model(type: Dictionary::class)))]
     public function dictionary(): void
     {
     }
 
     #[Route('/entity-with-ignored-property', methods: ['GET', 'POST'])]
-    #[OA\Response(
+    #[OAS\Response(
         response: 200,
         description: 'success',
-        content: new OA\JsonContent(
+        content: new OAS\MediaType\Json(
             ref: new Model(type: EntityWithIgnoredProperty::class),
         ),
     )]
@@ -565,13 +566,13 @@ class ApiController
     }
 
     #[Route('/swagger/model-parameter', methods: 'GET')]
-    #[OA\Parameter(name: 'user', in: 'query', content: new Model(type: User::class))]
-    #[OA\Parameter(
+    #[OAS\Parameter(name: 'user', in: 'query', schema: new OAS\Schema(ref: new Model(type: User::class)))] // nelmio: content: Model on a parameter means its schema
+    #[OAS\Parameter(
         name: 'list',
         in: 'query',
-        schema: new OA\Schema(
+        schema: new OAS\Schema(
             type: 'array',
-            items: new OA\Items(new Model(type: Article::class, groups: ['light'])),
+            items: new OAS\Schema\Items(ref: new Model(type: Article::class, groups: ['light'])),
         ),
     )]
     public function modelParameter(): void

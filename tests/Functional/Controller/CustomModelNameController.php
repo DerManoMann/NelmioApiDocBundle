@@ -11,50 +11,51 @@
 
 namespace Nelmio\ApiDocBundle\Tests\Functional\Controller;
 
-use Nelmio\ApiDocBundle\Attribute\Model;
+use Nelmio\ApiDocBundle\SpecDescribers\Model;
 use Nelmio\ApiDocBundle\Tests\Functional\Entity\Article;
-use OpenApi\Attributes as OA;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Attribute\Route;
+use OpenApi\Spec as OAS;
 
 #[Route('/custom_model_names')]
+#[OAS\Components]
 final class CustomModelNameController
 {
     #[Route('/unique', methods: 'POST')]
-    #[OA\RequestBody(
+    #[OAS\RequestBody(
         description: 'Request body description',
-        content: new Model(type: Article::class, name: 'MyUniqueArticle'),
+        content: new OAS\MediaType\Json(ref: new Model(type: Article::class, name: 'MyUniqueArticle')),
     )]
     public function postUniqueArticles(): void
     {
     }
 
     #[Route('/plain', methods: 'POST')]
-    #[OA\RequestBody(
+    #[OAS\RequestBody(
         description: 'Request body description',
-        content: new Model(type: Article::class, name: 'MyPlainArticle'),
+        content: new OAS\MediaType\Json(ref: new Model(type: Article::class, name: 'MyPlainArticle')),
     )]
     public function postPlainArticle(): void
     {
     }
 
     #[Route('/plain', methods: 'GET')]
-    #[OA\Response(
+    #[OAS\Response(
         response: Response::HTTP_OK,
         description: 'An article',
-        content: new Model(type: Article::class, name: 'MyPlainArticle'),
+        content: new OAS\MediaType\Json(ref: new Model(type: Article::class, name: 'MyPlainArticle')),
     )]
     public function getPlainArticle(): void
     {
     }
 
     #[Route('/plain/all', methods: 'GET')]
-    #[OA\Response(
+    #[OAS\Response(
         response: Response::HTTP_OK,
         description: 'Array of articles',
-        content: new OA\JsonContent(
+        content: new OAS\MediaType\Json(
             type: 'array',
-            items: new OA\Items(ref: new Model(type: Article::class, name: 'MyPlainArticle'))
+            items: new OAS\Schema\Items(ref: new Model(type: Article::class, name: 'MyPlainArticle'))
         )
     )]
     public function getAllPlainArticles(): void
@@ -62,10 +63,10 @@ final class CustomModelNameController
     }
 
     #[Route(methods: 'GET')]
-    #[OA\Response(
+    #[OAS\Response(
         response: Response::HTTP_OK,
         description: 'Normal article without custom model name',
-        content: new Model(type: Article::class),
+        content: new OAS\MediaType\Json(ref: new Model(type: Article::class)),
     )]
     public function getNormalArticle(): void
     {

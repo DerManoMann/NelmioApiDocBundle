@@ -11,29 +11,30 @@
 
 namespace Nelmio\ApiDocBundle\Tests\Functional\Controller;
 
-use Nelmio\ApiDocBundle\Attribute\Model;
+use Nelmio\ApiDocBundle\SpecDescribers\Model;
 use Nelmio\ApiDocBundle\Tests\Functional\Entity\BazingaUser;
-use OpenApi\Attributes as OA;
 use Symfony\Component\Routing\Attribute\Route;
+use OpenApi\Spec as OAS;
 
 #[Route(host: 'api.example.com')]
+#[OAS\Components]
 class BazingaController
 {
     #[Route(path: '/api/bazinga', methods: ['GET'])]
-    #[OA\Response(
+    #[OAS\Response(
         response: 200,
         description: 'Success',
-        content: new Model(type: BazingaUser::class)
+        content: new OAS\MediaType\Json(ref: new Model(type: BazingaUser::class))
     )]
     public function userAction(): void
     {
     }
 
     #[Route(path: '/api/bazinga_foo', methods: ['GET'])]
-    #[OA\Response(
+    #[OAS\Response(
         response: 200,
         description: 'Success',
-        content: new Model(type: BazingaUser::class, groups: ['foo'])
+        content: new OAS\MediaType\Json(ref: new Model(type: BazingaUser::class, groups: ['foo']))
     )]
     public function userGroupAction(): void
     {

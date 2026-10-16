@@ -13,9 +13,9 @@ namespace Nelmio\ApiDocBundle\Tests\Functional\Controller;
 
 use Nelmio\ApiDocBundle\Attribute\Security;
 use Nelmio\ApiDocBundle\Tests\Functional\Entity\Article;
-use OpenApi\Attributes as OA;
 use Symfony\Component\Routing\Attribute\Route;
 use Symfony\Component\Security\Http\Attribute\IsGranted;
+use OpenApi\Spec as OAS;
 
 #[Route(path: '/secured')]
 #[IsGranted('ROLE_USER')]
@@ -40,7 +40,7 @@ class SecuredApiController
     }
 
     #[Route('/user/documentation', methods: 'GET')]
-    #[OA\Get(
+    #[OAS\Operation\Get(
         security: [] // Explicitly set to empty array
     )]
     #[IsGranted('ROLE_USER')]

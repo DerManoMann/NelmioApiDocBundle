@@ -11,11 +11,11 @@
 
 namespace Nelmio\ApiDocBundle\Tests\Functional\Controller;
 
-use OpenApi\Attributes as OA;
 use Symfony\Component\Routing\Attribute\Route;
+use OpenApi\Spec as OAS;
 
 #[Route('/invoices', methods: 'GET')]
-#[OA\Tag(name: 'Invoices')]
+#[OAS\Tag(name: 'Invoices')]
 final class InvoiceDocumentController extends AbstractDocumentController
 {
 }

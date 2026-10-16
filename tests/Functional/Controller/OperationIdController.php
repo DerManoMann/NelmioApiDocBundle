@@ -12,9 +12,9 @@
 namespace Nelmio\ApiDocBundle\Tests\Functional\Controller;
 
 use Nelmio\ApiDocBundle\Attribute\Security;
-use OpenApi\Attributes as OA;
 use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\Routing\Attribute\Route;
+use OpenApi\Spec as OAS;
 
 /*
  * Not all operationIds were generated properly. This test case covers the following scenarios:
@@ -42,7 +42,7 @@ class OperationIdController
 
     // a route with an OA\Get annotation and a separate ApiDoc Annotation(extends GET operation with operationId)
     #[Route(path: '/generate/operation_id_with_security/', name: 'with_security', methods: 'GET')]
-    #[OA\Get('OperationId must be generated automatically when additional OA/nelmio root annotations are present')]
+    #[OAS\Operation\Get(path: 'OperationId must be generated automatically when additional OA/nelmio root annotations are present')]
     #[Security(name: 'bearerAuth')] // additional root annotations
     public function getWithAdditionalAnnotationsGeneratesOperationId(): JsonResponse
     {
@@ -51,7 +51,7 @@ class OperationIdController
 
     // a route with an OA\GET annotation (extends GET operation with operationId)
     #[Route(path: '/generate/operation_id_get', name: 'get_annotation', methods: 'GET')]
-    #[OA\Get(summary: 'OperationId must be generated automatically if not provided')]
+    #[OAS\Operation\Get(summary: 'OperationId must be generated automatically if not provided')]
     public function getMustGenerateOperationIByGetAnnotation(): JsonResponse
     {
         return new JsonResponse();
@@ -59,7 +59,7 @@ class OperationIdController
 
     // custom operationId is used when set explicitly
     #[Route(path: '/has/explicit/operationid', name: 'customOperationId', methods: 'GET')]
-    #[OA\Get(summary: 'Custom operation id must be used if provided', operationId: 'customOperationId')]
+    #[OAS\Operation\Get(summary: 'Custom operation id must be used if provided', operationId: 'customOperationId')]
     public function getWithCustomOperationId(): JsonResponse
     {
         return new JsonResponse();

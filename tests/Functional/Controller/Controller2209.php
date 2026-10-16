@@ -11,18 +11,18 @@
 
 namespace Nelmio\ApiDocBundle\Tests\Functional\Controller;
 
-use Nelmio\ApiDocBundle\Attribute\Model;
+use Nelmio\ApiDocBundle\SpecDescribers\Model;
 use Nelmio\ApiDocBundle\Tests\Functional\Entity\Article81;
-use OpenApi\Attributes as OA;
 use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpKernel\Attribute\MapRequestPayload;
 use Symfony\Component\Routing\Attribute\Route;
+use OpenApi\Spec as OAS;
 
 class Controller2209
 {
     #[Route(path: '/api/v3/users', name: 'api_v3_users_create', methods: 'POST')]
-    #[OA\RequestBody(
-        content: new OA\MediaType(mediaType: 'application/json', schema: new OA\Schema(
+    #[OAS\RequestBody(
+        content: new OAS\MediaType(mediaType: 'application/json', schema: new OAS\Schema(
             ref: new Model(type: Article81::class),
         )),
     )]
