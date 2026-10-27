@@ -130,7 +130,7 @@ class ApiController
             items: new OAS\Schema\Items(ref: '#/components/schemas/User'),
         ),
     )]
-    #[OAS\Operation\Get(tags: ['implicit'])] // was a method-level classic Tag, which spec does not allow (finding 16); Operation without a method throws (17)
+    #[OAS\Tag(name: 'implicit')]
     public function implicitSwaggerAction(): void
     {
     }
@@ -145,7 +145,7 @@ class ApiController
     )]
     #[OAS\RequestBody(
         description: 'This is a request body',
-        content: new OAS\MediaType\Json(ref: new Model(type: UserType::class, options: ['bar' => 'baz'])),
+        content: new Model(type: UserType::class, options: ['bar' => 'baz']),
     )]
     public function submitUserTypeAction(): void
     {
@@ -190,7 +190,7 @@ class ApiController
     #[Route('/form', methods: ['POST'])]
     #[OAS\RequestBody(
         description: 'Request content',
-        content: new OAS\MediaType\Json(ref: new Model(type: DummyType::class)),
+        content: new Model(type: DummyType::class),
     )]
     #[OAS\Response(response: 201, description: '')]
     public function formAction(): void
@@ -200,7 +200,7 @@ class ApiController
     #[Route('/form-model', methods: ['POST'])]
     #[OAS\RequestBody(
         description: 'Request content',
-        content: new OAS\MediaType\Json(ref: new Model(type: FormWithModel::class)),
+        content: new Model(type: FormWithModel::class),
     )]
     #[OAS\Response(response: 201, description: '')]
     public function formWithModelAction(): void
@@ -210,7 +210,7 @@ class ApiController
     #[Route('/form-model-renamed', methods: ['POST'])]
     #[OAS\RequestBody(
         description: 'Request content',
-        content: new OAS\MediaType\Json(ref: new Model(type: FormWithModel::class, name: 'RenamedFormWithModel')),
+        content: new Model(type: FormWithModel::class, name: 'RenamedFormWithModel'),
     )]
     #[OAS\Response(response: 201, description: '')]
     public function formWithModelRenamed(): void
@@ -238,7 +238,7 @@ class ApiController
     #[OAS\Response(
         response: '201',
         description: 'Used for symfony constraints test',
-        content: new OAS\MediaType\Json(ref: new Model(type: SymfonyConstraints::class)),
+        content: new Model(type: SymfonyConstraints::class),
     )]
     public function symfonyConstraintsAction(): void
     {
@@ -308,7 +308,7 @@ class ApiController
     #[OAS\Response(
         response: '201',
         description: 'Used for symfony constraints with validation groups test',
-        content: new OAS\MediaType\Json(ref: new Model(type: SymfonyConstraintsWithValidationGroups::class, groups: ['test'])),
+        content: new Model(type: SymfonyConstraintsWithValidationGroups::class, groups: ['test']),
     )]
     public function symfonyConstraintsWithGroupsAction(): void
     {
@@ -395,7 +395,7 @@ class ApiController
         description: 'Operation automatically detected',
     )]
     #[OAS\RequestBody(
-        content: new OAS\MediaType\Json(ref: new Model(type: FormWithAlternateSchemaType::class)),
+        content: new Model(type: FormWithAlternateSchemaType::class),
     )]
     public function formWithAlternateSchemaType(): void
     {
@@ -407,7 +407,7 @@ class ApiController
         description: 'Operation automatically detected',
     )]
     #[OAS\RequestBody(
-        content: new OAS\MediaType\Json(ref: new Model(type: FormWithRefType::class)),
+        content: new Model(type: FormWithRefType::class),
     )]
     public function formWithRefSchemaType(): void
     {
@@ -419,7 +419,7 @@ class ApiController
         description: 'Operation automatically detected',
     )]
     #[OAS\RequestBody(
-        content: new OAS\MediaType\Json(ref: new Model(type: FormWithCsrfProtectionEnabledType::class)),
+        content: new Model(type: FormWithCsrfProtectionEnabledType::class),
     )]
     public function formWithCsrfProtectionEnabledType(): void
     {
@@ -431,7 +431,7 @@ class ApiController
         description: 'Operation automatically detected',
     )]
     #[OAS\RequestBody(
-        content: new OAS\MediaType\Json(ref: new Model(type: FormWithCsrfProtectionDisabledType::class)),
+        content: new Model(type: FormWithCsrfProtectionDisabledType::class),
     )]
     public function formWithCsrfProtectionDisabledType(): void
     {
@@ -455,7 +455,7 @@ class ApiController
         description: 'Operation automatically detected',
     )]
     #[OAS\RequestBody(
-        content: new OAS\MediaType\Json(ref: new Model(type: EntityWithFalsyDefaults::class)),
+        content: new Model(type: EntityWithFalsyDefaults::class),
     )]
     public function entityWithFalsyDefaults(): void
     {
@@ -521,7 +521,7 @@ class ApiController
     }
 
     #[Route('/serializename', methods: ['GET'])]
-    #[OAS\Response(response: 200, description: 'success', content: new OAS\MediaType\Json(ref: new Model(type: SerializedNameEntity::class)))]
+    #[OAS\Response(response: 200, description: 'success', content: new Model(type: SerializedNameEntity::class))]
     public function serializedNameAction(): void
     {
     }
@@ -530,25 +530,25 @@ class ApiController
     #[OAS\Response(
         response: '200',
         description: '',
-        content: new OAS\MediaType\Json(ref: new Model(type: EntityThroughNameConverter::class, serializationContext: ['secret_name_converter_value' => true]))
+        content: new Model(type: EntityThroughNameConverter::class, serializationContext: ['secret_name_converter_value' => true])
     )]
     #[OAS\Response(
         response: '201',
         description: 'Same class without context',
-        content: new OAS\MediaType\Json(ref: new Model(type: EntityThroughNameConverter::class))
+        content: new Model(type: EntityThroughNameConverter::class)
     )]
     public function nameConverterContext(): void
     {
     }
 
     #[Route('/arbitrary_array', methods: ['GET'])]
-    #[OAS\Response(response: 200, description: 'Success', content: new OAS\MediaType\Json(ref: new Model(type: Foo::class)))]
+    #[OAS\Response(response: 200, description: 'Success', content: new Model(type: Foo::class))]
     public function arbitraryArray(): void
     {
     }
 
     #[Route('/dictionary', methods: ['GET'])]
-    #[OAS\Response(response: 200, description: 'Success', content: new OAS\MediaType\Json(ref: new Model(type: Dictionary::class)))]
+    #[OAS\Response(response: 200, description: 'Success', content: new Model(type: Dictionary::class))]
     public function dictionary(): void
     {
     }

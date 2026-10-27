@@ -20,25 +20,25 @@ use OpenApi\Spec as OAS;
 class ApiController81Collisions
 {
     #[Route('/article_81_group_full', methods: ['GET'])]
-    #[OAS\Response(response: 200, description: 'Success', content: new OAS\MediaType\Json(ref: new Model(type: Article81WithGroups::class, groups: ['full'])))]
+    #[OAS\Response(response: 200, description: 'Success', content: new Model(type: Article81WithGroups::class, groups: ['full']))]
     public function article81GroupFull(): void
     {
     }
 
     #[Route('/article_81_group_default', methods: ['GET'])]
-    #[OAS\Response(response: 200, description: 'Success', content: new OAS\MediaType\Json(ref: new Model(type: Article81WithGroups::class, groups: ['default'])))]
+    #[OAS\Response(response: 200, description: 'Success', content: new Model(type: Article81WithGroups::class, groups: ['default']))]
     public function article81GroupDefault(): void
     {
     }
 
     #[Route('/article_81_group_default_and_full', methods: ['GET'])]
-    #[OAS\Response(response: 200, description: 'Success', content: new OAS\MediaType\Json(ref: new Model(type: Article81WithGroups::class, groups: ['default', 'full'])))]
+    #[OAS\Response(response: 200, description: 'Success', content: new Model(type: Article81WithGroups::class, groups: ['default', 'full']))]
     public function article81GroupDefaultAndFull(): void
     {
     }
 
     #[Route('/article_81_group_empty', methods: ['GET'])]
-    #[OAS\Response(response: 200, description: 'Success', content: new OAS\MediaType\Json(ref: new Model(type: Article81WithGroups::class, groups: [])))]
+    #[OAS\Response(response: 200, description: 'Success', content: new Model(type: Article81WithGroups::class, groups: []))]
     public function article81GroupEmpty(): void
     {
     }

@@ -38,6 +38,12 @@ final class ModelContribution
             }
         });
 
+        // a Model that is a schema itself, as `content: new Model()` makes it (swagger-php #2285):
+        // its `ref` is the class name until the registry names it
+        $specification->getWalker()->visit(Model::class, function (Model $model): void {
+            $model->ref = $this->modelRegistry->register($model->toRegistryModel());
+        });
+
         // #[Response|RequestBody|Parameter(attachables: [new Model()])]: nelmio's implicit form
         $specification->getWalker()->visit(AttributeInterface::class, function (AttributeInterface $attribute): void {
             if (!$attribute instanceof OAS\Response && !$attribute instanceof OAS\RequestBody && !$attribute instanceof OAS\Parameter) {

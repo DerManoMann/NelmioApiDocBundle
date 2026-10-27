@@ -41,7 +41,7 @@ class MapRequestPayloadController
     #[Route('/article_map_request_payload_overwrite', methods: ['POST'])]
     #[OAS\RequestBody(
         description: 'Request body description',
-        content: new OAS\MediaType\Json(ref: new Model(type: EntityWithNullableSchemaSet::class)),
+        content: new Model(type: EntityWithNullableSchemaSet::class),
     )]
     #[OAS\Response(response: '200', description: '')]
     public function createArticleFromMapRequestPayloadOverwrite(

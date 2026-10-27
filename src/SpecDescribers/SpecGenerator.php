@@ -6,6 +6,7 @@ use Nelmio\ApiDocBundle\Model\ModelRegistry;
 use Nelmio\ApiDocBundle\OpenApiPhp\Util;
 use OpenApi\Annotations as OA;
 use OpenApi\Augmenter;
+use OpenApi\Assembler\OperationMethodsTranslator;
 use OpenApi\Builder;
 use OpenApi\Builder\Mode;
 use OpenApi\Builder\Result;
@@ -48,10 +49,11 @@ final class SpecGenerator
             ->setLogger($this->logger)
             ->setVersion($this->version)
             ->withAttributeFactory(fn (AttributeFactory $factory) => $factory->withTranslators(
+                // ahead of swagger-php's OperationMethodsTranslator, so a `methods:` operation is split
                 fn (TypedList $translators) => $translators
-                    ->add(new RouteOperationTranslator($routes, $reflector))
-                    ->add(new SecurityTranslator())
-                    ->add(new NelmioOperationTranslator())
+                    ->insert(new RouteOperationTranslator($routes, $reflector), OperationMethodsTranslator::class)
+                    ->insert(new SecurityTranslator(), OperationMethodsTranslator::class)
+                    ->insert(new NelmioOperationTranslator(), OperationMethodsTranslator::class)
             ))
             ->withMergers(fn (TypedList $mergers) => $mergers->insert(new DeepOperations(), Merge\LastWins::class))
             ->withAugmenters(fn (Pipeline $augmenters) => $augmenters
@@ -65,7 +67,7 @@ final class SpecGenerator
             // nelmio's PhpDocDescriber reads docblocks its own way (methods only)
             ->withAugmenters(fn (Pipeline $augmenters) => $augmenters->remove(Augmenter\Docblocks::class))
             // nelmio removes classic's OperationId processor, and classic gives an implicit tag no description
-            ->withAugmenters(fn (Pipeline $augmenters) => $augmenters->remove(Augmenter\OperationIds::class))
+            ->withAugmenters(fn (Pipeline $augmenters) => $augmenters->insert(new OperationIdTemplateAugmenter(), Augmenter\OperationIds::class)->remove(Augmenter\OperationIds::class))
             ->withAugmenters(fn (Pipeline $augmenters) => $augmenters->get(Augmenter\Tags::class)?->setWithDescription(false))
             ->withSpecification(new DescriberContribution($this->services->describers(), $registry, $scratch))
             ->withSpecification(new ModelContribution($registry, $scratch, $this->services->mediaTypes()));

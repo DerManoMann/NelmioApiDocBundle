@@ -22,7 +22,7 @@ class GenericTypesController
     #[OAS\Response(
         response: '200',
         description: 'Success',
-        content: new OAS\MediaType\Json(ref: new Model(type: GenericTypes::class)),
+        content: new Model(type: GenericTypes::class),
     )]
     #[Route('/generic-types', methods: ['GET'])]
     public function genericTypesAction(): void

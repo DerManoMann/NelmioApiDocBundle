@@ -27,7 +27,7 @@ class PromotedPropertiesController81
         description: 'Operation automatically detected',
     )]
     #[OAS\RequestBody(
-        content: new OAS\MediaType\Json(ref: new Model(type: EntityWithPromotedPropertiesWithDefaults::class)),
+        content: new Model(type: EntityWithPromotedPropertiesWithDefaults::class),
     )]
     public function entityWithPromotedPropertiesWithDefaults(): void
     {

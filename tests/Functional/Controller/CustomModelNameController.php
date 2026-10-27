@@ -24,7 +24,7 @@ final class CustomModelNameController
     #[Route('/unique', methods: 'POST')]
     #[OAS\RequestBody(
         description: 'Request body description',
-        content: new OAS\MediaType\Json(ref: new Model(type: Article::class, name: 'MyUniqueArticle')),
+        content: new Model(type: Article::class, name: 'MyUniqueArticle'),
     )]
     public function postUniqueArticles(): void
     {
@@ -33,7 +33,7 @@ final class CustomModelNameController
     #[Route('/plain', methods: 'POST')]
     #[OAS\RequestBody(
         description: 'Request body description',
-        content: new OAS\MediaType\Json(ref: new Model(type: Article::class, name: 'MyPlainArticle')),
+        content: new Model(type: Article::class, name: 'MyPlainArticle'),
     )]
     public function postPlainArticle(): void
     {
@@ -43,7 +43,7 @@ final class CustomModelNameController
     #[OAS\Response(
         response: Response::HTTP_OK,
         description: 'An article',
-        content: new OAS\MediaType\Json(ref: new Model(type: Article::class, name: 'MyPlainArticle')),
+        content: new Model(type: Article::class, name: 'MyPlainArticle'),
     )]
     public function getPlainArticle(): void
     {
@@ -66,7 +66,7 @@ final class CustomModelNameController
     #[OAS\Response(
         response: Response::HTTP_OK,
         description: 'Normal article without custom model name',
-        content: new OAS\MediaType\Json(ref: new Model(type: Article::class)),
+        content: new Model(type: Article::class),
     )]
     public function getNormalArticle(): void
     {

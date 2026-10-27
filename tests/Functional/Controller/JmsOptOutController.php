@@ -24,7 +24,7 @@ final class JmsOptOutController
     #[OAS\Response(
         response: 200,
         description: 'Success',
-        content: new OAS\MediaType\Json(ref: new Model(type: JMSUser::class))
+        content: new Model(type: JMSUser::class)
     )]
     public function jms(): void
     {
@@ -34,7 +34,7 @@ final class JmsOptOutController
     #[OAS\Response(
         response: 200,
         description: 'Success',
-        content: new OAS\MediaType\Json(ref: new Model(type: JMSUser::class, serializationContext: ['useJms' => false]))
+        content: new Model(type: JMSUser::class, serializationContext: ['useJms' => false])
     )]
     public function jmsOptOut(): void
     {

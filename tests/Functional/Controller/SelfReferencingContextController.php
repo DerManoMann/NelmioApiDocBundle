@@ -22,7 +22,7 @@ class SelfReferencingContextController
     #[OAS\Response(
         response: '200',
         description: 'Success',
-        content: new OAS\MediaType\Json(ref: new Model(type: EntityWithSelfReferencingContext::class)),
+        content: new Model(type: EntityWithSelfReferencingContext::class),
     )]
     #[Route('/self-referencing-context', methods: ['GET'])]
     public function selfReferencingContextAction(): void

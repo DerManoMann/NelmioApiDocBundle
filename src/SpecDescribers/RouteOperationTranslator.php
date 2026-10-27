@@ -25,6 +25,9 @@ final class RouteOperationTranslator implements AttributeTranslatorInterface
     /** @var array<string, list<array{string, Route, class-string}>>|null "Class::method" => [[name, route, controller], ...] */
     private ?array $byMethod = null;
 
+    /** @var array<string, true> "Class::method" of the handlers whose parameter attributes go to every operation */
+    private array $fanned = [];
+
     public function __construct(
         private readonly RouteCollection $routes,
         private readonly ControllerReflector $controllerReflector,
@@ -33,6 +36,7 @@ final class RouteOperationTranslator implements AttributeTranslatorInterface
 
     public function reset(): void
     {
+        $this->fanned = [];
     }
 
     public function getAttributes(\ReflectionClass|\ReflectionMethod|\ReflectionProperty|\ReflectionParameter|\ReflectionClassConstant $reflector): array
@@ -42,6 +46,17 @@ final class RouteOperationTranslator implements AttributeTranslatorInterface
 
     public function translate(array $attributes, array $created, \ReflectionClass|\ReflectionMethod|\ReflectionProperty|\ReflectionParameter|\ReflectionClassConstant $reflector): array
     {
+        // a PHP parameter's attributes go to every operation of a handler with several routes;
+        // with one route, swagger-php's OperationMethodsTranslator does this itself
+        if ($reflector instanceof \ReflectionParameter) {
+            $function = $reflector->getDeclaringFunction();
+            if ($function instanceof \ReflectionMethod && isset($this->fanned[$function->class.'::'.$function->name])) {
+                $this->fanAll($attributes);
+            }
+
+            return $attributes;
+        }
+
         // an invokable controller carries its attributes on the class (nelmio semantics)
         if ($reflector instanceof \ReflectionClass) {
             $routes = $reflector->hasMethod('__invoke') ? $this->routesFor($reflector->getMethod('__invoke'), $reflector->getName()) : [];
@@ -64,15 +79,24 @@ final class RouteOperationTranslator implements AttributeTranslatorInterface
 
         foreach ($routes as [$name, $route, $controller]) {
             $path = $this->normalizePath($route->getPath());
+            $generated = [];
             foreach ($this->methods($route) as $method) {
                 $operation = $this->claim($explicit, $method, $path);
                 if (null === $operation) {
-                    $attributes[] = $operation = new OAS\Operation(method: $method);
-                } else {
-                    $operation->setMeta(self::META_EXPLICIT, true);
+                    $generated[] = $method;
+                    continue;
                 }
+                $operation->setMeta(self::META_EXPLICIT, true);
                 $operation->path = $path;
                 $operation->operationId ??= $method.'_'.$name;
+                $operation->setMeta(self::META_CONTROLLER, $controller);
+                $operations[] = $operation;
+            }
+
+            // the methods no explicit operation claims share one operation, which swagger-php's
+            // OperationMethodsTranslator splits; `{method}` gives nelmio's `{method}_{route}` id
+            if ([] !== $generated) {
+                $attributes[] = $operation = new OAS\Operation(path: $path, operationId: '{method}_'.$name, methods: $generated);
                 $operation->setMeta(self::META_CONTROLLER, $controller);
                 $operations[] = $operation;
             }
@@ -85,7 +109,32 @@ final class RouteOperationTranslator implements AttributeTranslatorInterface
         // only without one do they belong to every operation of the route
         $claimed = array_values(array_filter($operations, fn ($o) => $this->wasExplicit($o)));
 
-        return $this->fanOut($attributes, [] !== $claimed ? $claimed : $operations);
+        if ([] !== $claimed) {
+            return $this->fanOut($attributes, $claimed);
+        }
+
+        // several routes: swagger-php fans out only for a lone operation, so say it here
+        if (\count($operations) > 1 && $reflector instanceof \ReflectionMethod) {
+            $this->fanAll($attributes);
+            $this->fanned[$reflector->class.'::'.$reflector->name] = true;
+        }
+
+        return $attributes;
+    }
+
+    /**
+     * Sets `Fan::All` on what would nest into an operation, where the attribute leaves it unset.
+     *
+     * @param list<object> $attributes
+     */
+    private function fanAll(array $attributes): void
+    {
+        foreach ($attributes as $attribute) {
+            if (($attribute instanceof OAS\Response || $attribute instanceof OAS\Parameter || $attribute instanceof OAS\RequestBody)
+                && null === $attribute->getFan()) {
+                $attribute->setFan(OAS\Fan::All);
+            }
+        }
     }
 
     private function wasExplicit(OAS\Operation $operation): bool
@@ -94,10 +143,9 @@ final class RouteOperationTranslator implements AttributeTranslatorInterface
     }
 
     /**
-     * WORKAROUND (finding 13): one method, several operations (a route with several methods, or
-     * none, meaning all). The assembler cannot tell which operation a sibling Response belongs to
-     * and throws "Ambiguous merge", so the translator nests a copy into each itself. Shallow
-     * clones: nested attributes are shared between the copies (PR 99).
+     * WORKAROUND (loopback L4): the loose attributes of a method with explicit operations go into
+     * those only (nelmio semantics), not into the operations generated beside them. `fan` cannot
+     * name a subset of the operations, so the translator nests a deep copy into each itself.
      *
      * @param list<object>        $attributes
      * @param list<OAS\Operation> $operations
@@ -106,7 +154,7 @@ final class RouteOperationTranslator implements AttributeTranslatorInterface
      */
     private function fanOut(array $attributes, array $operations): array
     {
-        if (\count($operations) < 2 && 1 === \count(array_filter($attributes, static fn ($a) => $a instanceof OAS\Operation))) {
+        if (1 === \count($operations) && 1 === \count(array_filter($attributes, static fn ($a) => $a instanceof OAS\Operation))) {
             return $attributes;
         }
 
@@ -123,7 +171,7 @@ final class RouteOperationTranslator implements AttributeTranslatorInterface
                 continue;
             }
             foreach ($operations as $operation) {
-                $copy = clone $attribute;
+                $copy = $attribute->copy();
                 if ('requestBody' === $slot) {
                     $operation->requestBody ??= $copy;
                 } else {

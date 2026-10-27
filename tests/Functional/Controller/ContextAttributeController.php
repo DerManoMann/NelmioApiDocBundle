@@ -24,7 +24,7 @@ class ContextAttributeController
     #[OAS\Response(
         response: '200',
         description: 'Success',
-        content: new OAS\MediaType\Json(ref: new Model(type: EntityWithContext::class)),
+        content: new Model(type: EntityWithContext::class),
     )]
     #[Route('/context-attribute', methods: ['GET'])]
     public function contextAction(): void
@@ -34,7 +34,7 @@ class ContextAttributeController
     #[OAS\Response(
         response: '200',
         description: 'Success',
-        content: new OAS\MediaType\Json(ref: new Model(type: EntityWithClassLevelContext::class)),
+        content: new Model(type: EntityWithClassLevelContext::class),
     )]
     #[Route('/context-attribute-class-level', methods: ['GET'])]
     public function classLevelContextAction(): void
@@ -44,7 +44,7 @@ class ContextAttributeController
     #[OAS\Response(
         response: '200',
         description: 'Success',
-        content: new OAS\MediaType\Json(ref: new Model(type: EntityWithGroupScopedContext::class, groups: ['plain'])),
+        content: new Model(type: EntityWithGroupScopedContext::class, groups: ['plain']),
     )]
     #[Route('/context-attribute-group-plain', methods: ['GET'])]
     public function groupScopedContextInactiveAction(): void
@@ -54,7 +54,7 @@ class ContextAttributeController
     #[OAS\Response(
         response: '200',
         description: 'Success',
-        content: new OAS\MediaType\Json(ref: new Model(type: EntityWithGroupScopedContext::class, groups: ['forced'])),
+        content: new Model(type: EntityWithGroupScopedContext::class, groups: ['forced']),
     )]
     #[Route('/context-attribute-group-forced', methods: ['GET'])]
     public function groupScopedContextActiveAction(): void
@@ -64,7 +64,7 @@ class ContextAttributeController
     #[OAS\Response(
         response: '200',
         description: 'Success',
-        content: new OAS\MediaType\Json(ref: new Model(type: EntityWithGroupScopedContext::class, groups: ['plain', 'type' => ['forced']])),
+        content: new Model(type: EntityWithGroupScopedContext::class, groups: ['plain', 'type' => ['forced']]),
     )]
     #[Route('/context-attribute-group-nested', methods: ['GET'])]
     public function groupScopedContextNestedAction(): void

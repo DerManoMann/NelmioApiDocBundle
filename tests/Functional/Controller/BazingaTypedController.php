@@ -24,7 +24,7 @@ class BazingaTypedController
     #[OAS\Response(
         response: 200,
         description: 'Success',
-        content: new OAS\MediaType\Json(ref: new Model(type: BazingaUserTyped::class))
+        content: new Model(type: BazingaUserTyped::class)
     )]
     public function userTypedAction(): void
     {

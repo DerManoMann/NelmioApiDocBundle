@@ -24,7 +24,7 @@ class BazingaController
     #[OAS\Response(
         response: 200,
         description: 'Success',
-        content: new OAS\MediaType\Json(ref: new Model(type: BazingaUser::class))
+        content: new Model(type: BazingaUser::class)
     )]
     public function userAction(): void
     {
@@ -34,7 +34,7 @@ class BazingaController
     #[OAS\Response(
         response: 200,
         description: 'Success',
-        content: new OAS\MediaType\Json(ref: new Model(type: BazingaUser::class, groups: ['foo']))
+        content: new Model(type: BazingaUser::class, groups: ['foo'])
     )]
     public function userGroupAction(): void
     {
