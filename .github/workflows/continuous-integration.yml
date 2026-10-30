@@ -213,7 +213,7 @@ jobs:
       - name: Setup dependencies
         uses: ./.github/workflows/common/composer-install
         with:
-          symfony-version: "7.2.*"
+          symfony-version: "7.4.*"
           test-group: all
 
       - name: Run PHPStan
