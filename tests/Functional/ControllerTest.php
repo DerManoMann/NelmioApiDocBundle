@@ -288,6 +288,10 @@ final class ControllerTest extends WebTestCase
             'OpenApiTagController',
         ];
 
+        yield 'Create top level Tag from Tag attribute, spec attributes' => [
+            'SpecOpenApiTagController',
+        ];
+
         yield 'Name collision with groups' => [
             'ApiController81Collisions',
             null,
@@ -733,6 +737,18 @@ final class ControllerTest extends WebTestCase
 
         yield 'Custom model names' => [
             'CustomModelNameController',
+        ];
+
+        yield 'Custom model names, spec attributes' => [
+            'SpecCustomModelNameController',
+        ];
+
+        yield 'PROTOTYPE probe, classic' => [
+            'ClassicProbeController',
+        ];
+
+        yield 'PROTOTYPE probe, spec attributes' => [
+            'SpecProbeController',
         ];
 
         yield 'Context attribute on properties' => [
