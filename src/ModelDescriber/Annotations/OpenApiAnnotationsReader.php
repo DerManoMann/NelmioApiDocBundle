@@ -28,6 +28,7 @@ class OpenApiAnnotationsReader
     use SetsContextTrait;
 
     private ModelRegister $modelRegister;
+    private ?SpecModelAttributesReader $specReader = null;
 
     /**
      * @param string[] $mediaTypes
@@ -35,11 +36,19 @@ class OpenApiAnnotationsReader
     public function __construct(ModelRegistry $modelRegistry, array $mediaTypes)
     {
         $this->modelRegister = new ModelRegister($modelRegistry, $mediaTypes);
+        if (class_exists(\OpenApi\Augmenter\DefaultMediaType::class)) {
+            $this->specReader = new SpecModelAttributesReader($modelRegistry);
+        }
     }
 
     public function updateSchema(\ReflectionClass $reflectionClass, OA\Schema $schema): void
     {
         if (null === $oaSchema = $this->getAttribute($schema->_context, $reflectionClass, OA\Schema::class)) {
+            // SPIKE: spec attributes, compiled and merged as an array
+            if (null !== $compiled = $this->specReader?->getSchema($reflectionClass, self::version($schema))) {
+                Util::merge($schema, $compiled, true);
+            }
+
             return;
         }
 
@@ -59,7 +68,7 @@ class OpenApiAnnotationsReader
     public function getPropertyName($reflection, string $default): string
     {
         if (null === $oaProperty = $this->getAttribute(new Context(), $reflection, OA\Property::class)) {
-            return $default;
+            return $this->specReader?->getProperty($reflection)?->property ?? $default;
         }
 
         return Generator::UNDEFINED !== $oaProperty->property ? $oaProperty->property : $default;
@@ -72,6 +81,11 @@ class OpenApiAnnotationsReader
     public function updateProperty($reflection, OA\Property $property, ?array $serializationGroups = null): void
     {
         if (null === $oaProperty = $this->getAttribute($property->_context, $reflection, OA\Property::class)) {
+            // SPIKE: spec attributes, compiled and merged as an array
+            if (null !== $compiled = $this->specReader?->getPropertySchema($reflection, self::version($property), $serializationGroups)) {
+                Util::merge($property, $compiled, true);
+            }
+
             return;
         }
 
@@ -83,6 +97,11 @@ class OpenApiAnnotationsReader
         }
 
         $property->mergeProperties($oaProperty);
+    }
+
+    private static function version(OA\AbstractAnnotation $annotation): string
+    {
+        return $annotation->_context->version ?? OA\OpenApi::VERSION_3_0_0;
     }
 
     /**

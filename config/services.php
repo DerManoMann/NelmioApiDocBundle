@@ -101,7 +101,7 @@ return static function (ContainerConfigurator $container) {
            ->private()
            ->tag('nelmio_api_doc.describer', ['priority' => -1000])
 
-       ->set('nelmio_api_doc.route_describers.route_metadata', \Nelmio\ApiDocBundle\RouteDescriber\RouteMetadataDescriber::class)
+       ->set('nelmio_api_doc.route_describers.route_metadata', \Nelmio\ApiDocBundle\RouteDescriber\SpecRouteMetadataDescriber::class)
            ->private()
            ->tag('nelmio_api_doc.route_describer', ['priority' => -300])
 

@@ -1,0 +1,310 @@
+{
+    "openapi": "3.0.0",
+    "info": {
+        "title": "",
+        "version": "0.0.0"
+    },
+    "paths": {
+        "/probe/models": {
+            "get": {
+                "operationId": "get_probe_models",
+                "responses": {
+                    "200": {
+                        "description": "User",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/User"
+                                }
+                            }
+                        }
+                    },
+                    "201": {
+                        "description": "Alternate type",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/EntityWithAlternateType"
+                                }
+                            }
+                        }
+                    },
+                    "202": {
+                        "description": "Ref",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/EntityWithRef"
+                                }
+                            }
+                        }
+                    },
+                    "203": {
+                        "description": "Holder",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/ArticleHolder"
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        }
+    },
+    "components": {
+        "schemas": {
+            "User": {
+                "required": [
+                    "email",
+                    "location",
+                    "friendsNumber",
+                    "creationDate",
+                    "users",
+                    "dummy",
+                    "status",
+                    "dateAsInterface"
+                ],
+                "properties": {
+                    "money": {
+                        "type": "number",
+                        "format": "float",
+                        "default": 0
+                    },
+                    "id": {
+                        "title": "userid",
+                        "description": "User id",
+                        "type": "integer",
+                        "readOnly": true,
+                        "example": 1,
+                        "default": null
+                    },
+                    "email": {
+                        "type": "string",
+                        "readOnly": false
+                    },
+                    "roles": {
+                        "title": "roles",
+                        "description": "User roles",
+                        "type": "array",
+                        "items": {
+                            "type": "string"
+                        },
+                        "example": "[\"ADMIN\",\"SUPERUSER\"]",
+                        "default": [
+                            "user"
+                        ]
+                    },
+                    "location": {
+                        "title": "User Location.",
+                        "type": "string"
+                    },
+                    "friendsNumber": {
+                        "type": "string"
+                    },
+                    "creationDate": {
+                        "type": "string",
+                        "format": "date-time"
+                    },
+                    "users": {
+                        "type": "array",
+                        "items": {
+                            "$ref": "#/components/schemas/User"
+                        }
+                    },
+                    "friend": {
+                        "oneOf": [
+                            {
+                                "$ref": "#/components/schemas/User"
+                            },
+                            {
+                                "type": "object",
+                                "nullable": true,
+                                "enum": [
+                                    null
+                                ]
+                            }
+                        ]
+                    },
+                    "friends": {
+                        "type": "array",
+                        "items": {
+                            "$ref": "#/components/schemas/User"
+                        },
+                        "nullable": true,
+                        "default": []
+                    },
+                    "dummy": {
+                        "$ref": "#/components/schemas/Dummy"
+                    },
+                    "status": {
+                        "type": "string",
+                        "enum": [
+                            "disabled",
+                            "enabled"
+                        ]
+                    },
+                    "dateAsInterface": {
+                        "type": "string",
+                        "format": "date-time"
+                    }
+                },
+                "type": "object"
+            },
+            "Dummy": {
+                "required": [
+                    "id",
+                    "name"
+                ],
+                "properties": {
+                    "id": {
+                        "type": "integer"
+                    },
+                    "name": {
+                        "type": "string"
+                    }
+                },
+                "type": "object"
+            },
+            "EntityWithAlternateType": {
+                "type": "array",
+                "items": {
+                    "type": "string"
+                }
+            },
+            "EntityWithRef": {
+                "$ref": "#/components/schemas/Test"
+            },
+            "User2": {
+                "required": [
+                    "email",
+                    "location",
+                    "friendsNumber",
+                    "creationDate",
+                    "users",
+                    "dummy",
+                    "status",
+                    "dateAsInterface"
+                ],
+                "properties": {
+                    "money": {
+                        "type": "number",
+                        "format": "float",
+                        "default": 0
+                    },
+                    "id": {
+                        "title": "userid",
+                        "description": "User id",
+                        "type": "integer",
+                        "readOnly": true,
+                        "example": 1,
+                        "default": null
+                    },
+                    "email": {
+                        "type": "string",
+                        "readOnly": false
+                    },
+                    "roles": {
+                        "title": "roles",
+                        "description": "User roles",
+                        "type": "array",
+                        "items": {
+                            "type": "string"
+                        },
+                        "example": "[\"ADMIN\",\"SUPERUSER\"]",
+                        "default": [
+                            "user"
+                        ]
+                    },
+                    "location": {
+                        "title": "User Location.",
+                        "type": "string"
+                    },
+                    "friendsNumber": {
+                        "type": "string"
+                    },
+                    "creationDate": {
+                        "type": "string",
+                        "format": "date-time"
+                    },
+                    "users": {
+                        "type": "array",
+                        "items": {
+                            "$ref": "#/components/schemas/User2"
+                        }
+                    },
+                    "friend": {
+                        "oneOf": [
+                            {
+                                "$ref": "#/components/schemas/User2"
+                            },
+                            {
+                                "type": "object",
+                                "nullable": true,
+                                "enum": [
+                                    null
+                                ]
+                            }
+                        ]
+                    },
+                    "friends": {
+                        "type": "array",
+                        "items": {
+                            "$ref": "#/components/schemas/User2"
+                        },
+                        "nullable": true,
+                        "default": []
+                    },
+                    "dummy": {
+                        "$ref": "#/components/schemas/Dummy"
+                    },
+                    "status": {
+                        "type": "string",
+                        "enum": [
+                            "disabled",
+                            "enabled"
+                        ]
+                    },
+                    "dateAsInterface": {
+                        "type": "string",
+                        "format": "date-time"
+                    }
+                },
+                "type": "object"
+            },
+            "Article": {
+                "required": [
+                    "author",
+                    "content"
+                ],
+                "properties": {
+                    "author": {
+                        "$ref": "#/components/schemas/User2"
+                    },
+                    "content": {
+                        "type": "string"
+                    }
+                },
+                "type": "object"
+            },
+            "ArticleHolder": {
+                "required": [
+                    "article",
+                    "label"
+                ],
+                "properties": {
+                    "article": {
+                        "$ref": "#/components/schemas/Article"
+                    },
+                    "label": {
+                        "description": "A label",
+                        "type": "string",
+                        "maxLength": 20
+                    }
+                },
+                "type": "object"
+            }
+        }
+    }
+}
